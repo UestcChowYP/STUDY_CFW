@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+<!--
+targetRuntime:执行生成的逆向工程的版本
+MyBatis3simple:生成基本的CRUD(清新简洁版)
+MyBatis3:生成带条件的CRUD(奢华尊享版)
+-->
+    <context id="DB2Tables"  targetRuntime="MyBatis3">
+        <!-- 数据库连接驱动类,URL，用户名、密码 -->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:4306/project_zcw"
+                        userId="root"
+                        password="z123456">
+        </jdbcConnection>
+        <!-- javaBean的生成策略 -->
+        <javaModelGenerator targetPackage="com.uestc.crowd.entity" targetProject="./src/main/java">
+            <!-- 在targetPackage的基础上，根据数据库的schema再生成一层package，最终生成的类放在这个package下，默认为false -->
+            <property name="enableSubPackages" value="true"/>
+            <!-- 设置是否在getter方法中，对String类型字段调用trim()方法:去除字符串前后的空格-->
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+        <!--SQL映射文件的生成策略-->
+        <!-- 生成xml映射文件：包名(targetPackage)、位置(targetProject) -->
+        <sqlMapGenerator targetPackage="com.uestc.crowd.mapper" targetProject=".\src\main\resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+        <!--Mapper接口的生成策略-->
+        <!-- 生成DAO接口：包名(targetPackage)、位置(targetProject) -->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.uestc.crowd.mapper" targetProject=".\src\main\java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+        <!--逆向分析的表-->
+        <!-- tableName设置为*号，可以对应所有表，此时不写domainobjectName -->
+        <!--domainobjectName属性指定生成出来的实体类的类名-->
+        <table tableName="t_menu" domainObjectName="Menu" />
+    </context>
+</generatorConfiguration>

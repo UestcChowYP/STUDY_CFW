@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+<!--    <welcome-file-list>-->
+<!--        <welcome-file>index.html</welcome-file>-->
+<!--        <welcome-file>index.jsp</welcome-file>-->
+<!--    </welcome-file-list>-->
+
+<!--    <context-param>-->
+<!--        <param-name>contextConfigLocation</param-name>-->
+<!--        <param-value>classpath:mybatis-presist-*.xml</param-value>-->
+<!--    </context-param>-->
+<!--    <listener>-->
+<!--        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
+<!--    </listener>-->
+
+    <servlet>
+        <servlet-name>springDispatcherServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring-*.xml</param-value>
+        </init-param>
+<!--生命周期：默认在第一次请求时创建对象-->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>springDispatcherServlet</servlet-name>
+<!--url-pattern配置方式一:/表示拦截所有请求-->
+<!--        <url-pattern>/</url-pattern>-->
+<!--url-pattern配置方式二:配置请求扩展名
+优点1：静态资源(css,js,png等)不经过springMVC 处理
+优点2：伪静态，表面上访问html静态资源，实际上也是由java代码处理的结果。
+    增加入侵难度
+    利于SEO优化
+    不符合RestFul风格
+-->
+        <url-pattern>*.html</url-pattern>
+<!--区别html的处理返回json的请求-->
+<!--为了让Ajax请求能够顺利拿到JSON格式的响应数据，我们另外配置json扩展名-->
+        <url-pattern>*.json</url-pattern>
+    </servlet-mapping>
+    <filter>
+        <filter-name>characterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceRequestEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceResponseEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+<!--字符集-->
+<!--这个Filter执行的顺序要在所有其他Filter前面-->
+<!--request,setCharacterEncoding(encoding)必须在request.getParameter()前面
+response.setCharacterEncoding(encoding)必须在response.getWriter()前面-->
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <jsp-config>
+        <jsp-property-group>
+            <display-name>JsConfiguration</display-name>
+            <url-pattern>*.js</url-pattern>
+            <page-encoding>UTF-8</page-encoding>
+        </jsp-property-group>
+    </jsp-config>
+</web-app>

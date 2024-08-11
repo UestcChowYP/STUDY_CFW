@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--添加名称空间-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <import resource="mybatis-presist-config.xml"/>
+<!--配置自动扫描的包:主要是为了把Service扫描到IOC容器中-->
+    <context:component-scan base-package="com.uestc.crowd.service" />
+<!--配置事务管理器-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+<!--装配数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+<!--配置事务切面-->
+    <aop:config>
+<!--任意访问修饰符/返回值类型 任意包名下任意深度的Service(可能与spring-security某些类冲突)/ServiceImpl结尾的类的所有方法 参数任意-->
+        <aop:pointcut id="txPointCut" expression="execution(* *..*ServiceImpl.*(..))"/>
+<!--将切入点表达式和事务通知关联起来-->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut" />
+    </aop:config>
+<!--配置事务通知-->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+<!--配置事务属性-->
+        <tx:attributes>
+<!--查询方法:配置只读属性，让数据库知道这是一个查询操作，能够进行一定优化-->
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="query*" read-only="true"/>
+            <tx:method name="count*" read-only="true"/>
+<!--增删改方法:配置事务传播行为、回滚异常-->
+<!--propagation属性:
+    REQUIRED:存在事务就继续使用，不存在则创建(会被原有事务回滚)
+    REQUIRES_NEW:自己开新的事务
+-->
+<!--rollback-for属性:配置事务方法针对什么样的异常回滚
+默认:运行时异常回滚
+建议:编译时异常和运行时异常都回滚
+-->
+            <tx:method name="save*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception" />
+            <tx:method name="update*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception" />
+            <tx:method name="remove*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception" />
+            <tx:method name="batch*" propagation="REQUIRES_NEW" rollback-for="java.lang.Exception" />
+        </tx:attributes>
+    </tx:advice>
+</beans>
